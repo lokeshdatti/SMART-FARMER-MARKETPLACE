@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact & Customer Support | Smart Farmer Marketplace{% endblock %}
+
+{% block content %}
+<div class="section-header" style="margin-bottom: 3rem;">
+    <div>
+        <h2 class="section-title">Support & Contact</h2>
+        <p style="color:var(--text-muted); margin-top: 0.5rem;">Have questions? Reach out to us or submit a support ticket below.</p>
+    </div>
+</div>
+
+<div class="cart-layout" style="grid-template-columns: 1.2fr 1.5fr;">
+    <!-- Left Column: Support info & FAQs -->
+    <div style="display:flex; flex-direction:column; gap:2rem;">
+        <!-- Contact Cards -->
+        <div class="panel-card" style="margin-bottom:0;">
+            <h3 style="color:var(--primary-dark); margin-bottom:1rem;"><i class="fa-solid fa-address-book"></i> Connect With Us</h3>
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:1rem;">
+                <li style="display:flex; align-items:center; gap:0.8rem;">
+                    <div style="width:35px; height:35px; border-radius:50%; background-color:var(--primary-pale); color:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fa-solid fa-envelope"></i></div>
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--text-muted); display:block;">Email Address</span>
+                        <a href="mailto:support@smartfarmer.com" style="font-weight:600; color:var(--primary-light);">support@smartfarmer.com</a>
+                    </div>
+                </li>
+                <li style="display:flex; align-items:center; gap:0.8rem;">
+                    <div style="width:35px; height:35px; border-radius:50%; background-color:var(--primary-pale); color:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fa-solid fa-phone"></i></div>
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--text-muted); display:block;">Toll-Free Support Helpline</span>
+                        <span style="font-weight:600;">1800-456-7890 (9 AM - 6 PM)</span>
+                    </div>
+                </li>
+                <li style="display:flex; align-items:center; gap:0.8rem;">
+                    <div style="width:35px; height:35px; border-radius:50%; background-color:var(--primary-pale); color:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fa-solid fa-location-dot"></i></div>
+                    <div>
+                        <span style="font-size:0.8rem; color:var(--text-muted); display:block;">Market Headquarters</span>
+                        <span style="font-weight:600;">C: Folder: Lokesh, Local Disk C, India</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- FAQs -->
+        <div class="panel-card" style="margin-bottom:0;">
+            <h3 style="color:var(--primary-dark); margin-bottom:1rem;"><i class="fa-solid fa-circle-question"></i> Frequently Asked Questions</h3>
+            <div style="display:flex; flex-direction:column; gap:1rem; font-size:0.9rem;">
+                <div>
+                    <h4 style="color:var(--primary-light); margin-bottom:0.2rem;">Q: How do I know the vegetables are fresh?</h4>
+                    <p style="color:var(--text-muted);">A: When you place an order, the farmer receives a notification immediately. The crops are harvested within hours and shipped directly.</p>
+                </div>
+                <div>
+                    <h4 style="color:var(--primary-light); margin-bottom:0.2rem;">Q: How does AI price prediction help me?</h4>
+                    <p style="color:var(--text-muted);">A: It prevents middleman exploitation. The system forecasts the value using historic data, crop seasons, and demand/supply to ensure fair prices for both sides.</p>
+                </div>
+                <div>
+                    <h4 style="color:var(--primary-light); margin-bottom:0.2rem;">Q: How does regional shipping work?</h4>
+                    <p style="color:var(--text-muted);">A: Sourcing is optimized based on geographic distance. We match you with regional farmers to reduce freight time and carbon emissions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Support Ticketing Form -->
+    <div class="panel-card" style="margin-bottom: 0;">
+        <h3 class="panel-title" style="color:var(--primary-dark);"><i class="fa-solid fa-headset"></i> Submit a Support Ticket</h3>
+        
+        <form action="{{ url_for('contact') }}" method="POST">
+            <div class="form-group">
+                <label for="support-name" class="form-label">Your Name</label>
+                <input type="text" name="name" id="support-name" class="form-control" 
+                       value="{{ current_user.name if current_user else '' }}" placeholder="Enter full name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="support-email" class="form-label">Email Address</label>
+                <input type="email" name="email" id="support-email" class="form-control" 
+                       value="{{ current_user.email if current_user else '' }}" placeholder="Enter contact email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="support-subject" class="form-label">Subject</label>
+                <input type="text" name="subject" id="support-subject" class="form-control" placeholder="What do you need help with?" required>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label for="support-message" class="form-label">Message details</label>
+                <textarea name="message" id="support-message" class="form-control" rows="5" placeholder="Provide order IDs, questions, or details about crop quality..." required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding:0.8rem;"><i class="fa-solid fa-paper-plane"></i> Submit Support Message</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In | Smart Farmer Marketplace{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2 style="text-align: center; margin-bottom: 0.5rem; color: var(--primary-dark);">Welcome Back</h2>
+    <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Sign in to access your dashboard and listings.</p>
+    
+    <!-- Auth Toggle Tabs -->
+    <div class="auth-tabs">
+        <div id="customer-tab" class="auth-tab active" onclick="setRole('customer')">
+            <i class="fa-solid fa-basket-shopping"></i> Customer
+        </div>
+        <div id="farmer-tab" class="auth-tab" onclick="setRole('farmer')">
+            <i class="fa-solid fa-tractor"></i> Farmer
+        </div>
+    </div>
+    
+    <!-- Form -->
+    <form action="{{ url_for('login', next=request.args.get('next', '')) }}" method="POST">
+        <!-- Hidden input to submit selected role -->
+        <input type="hidden" name="role" id="role-input" value="customer">
+        
+        <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="enter your registered email" required autocomplete="email">
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        
+        <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">
+            Login as Customer
+        </button>
+    </form>
+    
+    <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+        <span style="color: var(--text-muted);">New to Smart Farmer? </span>
+        <a href="{{ url_for('register') }}" style="color: var(--primary-light); font-weight: 700;">Create an account</a>
+    </div>
+</div>
+
+<script>
+    function setRole(role) {
+        document.getElementById('role-input').value = role;
+        
+        // Toggle tab highlights
+        document.getElementById('customer-tab').classList.toggle('active', role === 'customer');
+        document.getElementById('farmer-tab').classList.toggle('active', role === 'farmer');
+        
+        // Update submit button text
+        const btn = document.getElementById('submit-btn');
+        if (role === 'customer') {
+            btn.innerHTML = '<i class="fa-solid fa-basket-shopping"></i> Login as Customer';
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-tractor"></i> Login as Farmer';
+        }
+    }
+    // Set initial text
+    setRole('customer');
+</script>
+{% endblock %}

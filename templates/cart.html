@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Basket | Smart Farmer Marketplace{% endblock %}
+
+{% block content %}
+<div class="section-header" style="margin-bottom: 2rem;">
+    <div>
+        <h2 class="section-title">Your Shopping Basket</h2>
+        <p style="color:var(--text-muted); margin-top: 0.5rem;">Review your items and complete checkout directly with our farmers.</p>
+    </div>
+</div>
+
+{% if cart_items %}
+    <div class="cart-layout">
+        <!-- Left Side: Table of Items -->
+        <div>
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Vegetable</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                        <tr>
+                            <td class="cart-prod-cell">
+                                <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="cart-prod-img">
+                                <div>
+                                    <h4 style="color:var(--primary-dark);">{{ item.product.name }}</h4>
+                                    <span style="font-size:0.8rem; color:var(--text-muted);">Farmer: {{ item.product.farmer.name }}</span>
+                                </div>
+                            </td>
+                            <td>Rs. {{ item.product.price }}</td>
+                            <td>
+                                <!-- Auto-submits on change/blur via JS handler -->
+                                <form action="{{ url_for('update_cart', product_id=item.product.id) }}" method="POST" class="cart-qty-form">
+                                    <input type="number" name="quantity" class="form-control cart-qty-input" 
+                                           value="{{ item.quantity }}" min="0.1" max="{{ item.product.quantity }}" step="0.1" required>
+                                    <span style="font-size: 0.9rem; color:var(--text-muted)">{{ item.product.unit }}</span>
+                                </form>
+                            </td>
+                            <td style="font-weight: 700; color: var(--primary-dark);">Rs. {{ item.total_price }}</td>
+                            <td>
+                                <a href="{{ url_for('remove_from_cart', product_id=item.product.id) }}" class="btn btn-danger btn-icon btn-sm" title="Remove Item" onclick="return confirm('Remove {{ item.product.name }} from cart?')">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <a href="{{ url_for('products') }}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Continue Shopping</a>
+            </div>
+        </div>
+
+        <!-- Right Side: Order Summary & Checkout Form -->
+        <aside class="cart-summary-box">
+            <h3 style="color:var(--primary-dark); margin-bottom: 1.5rem; font-family:'Outfit', sans-serif; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">Checkout Summary</h3>
+            
+            <div class="summary-row">
+                <span>Basket Subtotal</span>
+                <strong>Rs. {{ subtotal }}</strong>
+            </div>
+            
+            <div class="summary-row">
+                <span>Delivery Charges</span>
+                <strong style="color:var(--primary-light);">FREE</strong>
+            </div>
+            
+            <div class="summary-row" style="margin-bottom: 2rem; border-bottom: 2px solid var(--primary-pale); padding-bottom: 1rem;">
+                <span class="summary-total">Total Amount</span>
+                <strong class="summary-total">Rs. {{ subtotal }}</strong>
+            </div>
+            
+            <!-- Checkout Form -->
+            <form action="{{ url_for('checkout') }}" method="POST">
+                <div class="form-group">
+                    <label for="shipping_address" class="form-label">Shipping Address</label>
+                    <textarea name="shipping_address" id="shipping_address" class="form-control" rows="3" placeholder="Enter address for delivery..." required>{{ current_user.address }}</textarea>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label for="payment_method" class="form-label">Payment Method</label>
+                    <select name="payment_method" id="payment_method" class="form-control" required>
+                        <option value="Card">💳 Credit / Debit Card</option>
+                        <option value="UPI">📱 UPI Payment (GPay, PhonePe)</option>
+                        <option value="Cash on Delivery" selected>💵 Cash on Delivery (COD)</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem; font-size:1.05rem;" onclick="return confirm('Confirm placing this order?')">
+                    <i class="fa-solid fa-circle-check"></i> Place Order (Rs. {{ subtotal }})
+                </button>
+            </form>
+        </aside>
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 5rem 2rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-color); max-width: 600px; margin: 2rem auto;">
+        <i class="fa-solid fa-basket-shopping" style="font-size: 4.5rem; color:var(--primary-pale); margin-bottom: 1.5rem;"></i>
+        <h3 style="color:var(--primary-dark);">Your Basket is Empty</h3>
+        <p style="color:var(--text-muted); margin-top: 0.5rem; margin-bottom: 2rem;">You haven't added any fresh organic vegetables to your shopping basket yet.</p>
+        <a href="{{ url_for('products') }}" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Explore Vegetables</a>
+    </div>
+{% endif %}
+{% endblock %}

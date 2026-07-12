@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Farmer-to-Consumer Market{% endblock %}</title>
+    
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js CDN for AI Price Prediction Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom Style System -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="navbar">
+            <a href="{{ url_for('index') }}" class="logo-container">
+                <span class="logo-text"><span class="logo-icon">🌿</span> Smart Farmer</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a></li>
+                <li><a href="{{ url_for('products') }}" class="nav-link {% if request.path == '/products' %}active{% endif %}">Vegetables</a></li>
+                
+                {% if current_role == 'farmer' %}
+                    <li><a href="{{ url_for('farmer_dashboard') }}" class="nav-link {% if request.path == '/farmer/dashboard' %}active{% endif %}">Farmer Portal</a></li>
+                {% elif current_role == 'customer' %}
+                    <li><a href="{{ url_for('customer_dashboard') }}" class="nav-link {% if request.path == '/customer/dashboard' %}active{% endif %}">Dashboard</a></li>
+                    <li><a href="{{ url_for('view_cart') }}" class="nav-link {% if request.path == '/cart' %}active{% endif %}"><i class="fa-solid fa-basket-shopping"></i> Cart ({{ cart_count }})</a></li>
+                {% endif %}
+                
+                <li><a href="{{ url_for('contact') }}" class="nav-link {% if request.path == '/contact' %}active{% endif %}">Support</a></li>
+            </ul>
+            
+            <div class="nav-buttons">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle Light/Dark Theme">🌙</button>
+                
+                {% if current_user %}
+                    <span style="font-size: 0.9rem; font-weight:600; color:var(--primary);">
+                        <i class="fa-solid fa-user"></i> {{ current_user.name }} ({{ current_role | capitalize }})
+                    </span>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Join</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Notification Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span>{{ message }}</span>
+                        <button style="background:none; border:none; cursor:pointer; color:inherit; font-size:1.2rem;" onclick="this.parentElement.remove()">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content Body -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-layout">
+            <div class="footer-about">
+                <h3 class="footer-title">🌿 Smart Farmer-to-Consumer Market</h3>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; line-height: 1.5;">
+                    Empowering farmers by eliminating middlemen. Buy directly from regional fields, ensuring fresh crop availability, fair wages for agriculture, and chemical-free fresh vegetables for your family.
+                </p>
+            </div>
+            <div>
+                <h4 class="footer-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('products') }}">Shop Vegetables</a></li>
+                    <li><a href="{{ url_for('contact') }}">Farmer Support</a></li>
+                    <li><a href="{{ url_for('login') }}">Member Access</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-title">Categories</h4>
+                <ul class="footer-links" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem;">
+                    <li><a href="{{ url_for('products', category='Leafy Greens') }}">Leafy Greens</a></li>
+                    <li><a href="{{ url_for('products', category='Cruciferous') }}">Cruciferous</a></li>
+                    <li><a href="{{ url_for('products', category='Nightshades') }}">Nightshades</a></li>
+                    <li><a href="{{ url_for('products', category='Root Vegetables') }}">Root Vegetables</a></li>
+                    <li><a href="{{ url_for('products', category='Gourds & Pumpkins') }}">Gourds & Pumpkins</a></li>
+                    <li><a href="{{ url_for('products', category='Beans & Pods') }}">Beans & Pods</a></li>
+                    <li><a href="{{ url_for('products', category='Fruits & Cucumbers') }}">Fruits & Cucumbers</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Smart Farmer Marketplace. All rights reserved.</p>
+            <p>Made with ❤️ for Lokesh</p>
+        </div>
+    </footer>
+
+    <!-- Main Controller Script -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

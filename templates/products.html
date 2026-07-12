@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop Organic Produce | Smart Farmer Marketplace{% endblock %}
+
+{% block content %}
+<div class="section-header" style="margin-bottom: 2rem;">
+    <div>
+        <h2 class="section-title">Vegetables Directory</h2>
+        <p style="color:var(--text-muted); margin-top: 0.5rem;">Browse and buy chemical-free organic vegetables directly harvested for you.</p>
+    </div>
+</div>
+
+<div class="catalog-layout">
+    <!-- Sidebar Filters -->
+    <aside class="sidebar-filter">
+        <h3 class="filter-title"><i class="fa-solid fa-sliders"></i> Filter By</h3>
+        
+        <form action="{{ url_for('products') }}" method="GET" id="filter-form">
+            <!-- Search Box -->
+            <div class="filter-section">
+                <label class="filter-section-title" for="search-input">Search Keywords</label>
+                <div class="search-box">
+                    <input type="text" name="search" id="search-input" class="form-control search-input" 
+                           placeholder="Search spinach, broccoli..." value="{{ search_query }}">
+                    <button type="submit" class="search-btn" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </div>
+            
+            <!-- Category List -->
+            <div class="filter-section">
+                <span class="filter-section-title">Categories</span>
+                <!-- Preserving sorting and pricing while clicking category links -->
+                <input type="hidden" name="category" id="category-hidden" value="{{ selected_category }}">
+                <input type="hidden" name="sort" value="{{ sort_by }}">
+                
+                <ul class="cat-filter-list" style="margin-top: 0.5rem;">
+                    <li class="cat-filter-item">
+                        <a href="#" class="cat-filter-link {% if not selected_category %}active{% endif %}" 
+                           onclick="selectCategory('')">All Categories</a>
+                    </li>
+                    {% for cat in categories %}
+                        <li class="cat-filter-item">
+                            <a href="#" class="cat-filter-link {% if selected_category == cat %}active{% endif %}" 
+                               onclick="selectCategory('{{ cat }}')">{{ cat }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <!-- Price Range -->
+            <div class="filter-section">
+                <span class="filter-section-title">Price Range (Rs.)</span>
+                <div class="price-inputs" style="margin-top: 0.5rem;">
+                    <input type="number" name="min_price" class="form-control price-input" 
+                           placeholder="Min" value="{{ min_price if min_price is not none else '' }}" min="0">
+                    <span style="color:var(--text-muted)">-</span>
+                    <input type="number" name="max_price" class="form-control price-input" 
+                           placeholder="Max" value="{{ max_price if max_price is not none else '' }}" min="0">
+                </div>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:0.5rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">
+                    Apply Filters
+                </button>
+                <a href="{{ url_for('products') }}" class="btn btn-secondary btn-sm" style="width: 100%;">
+                    Clear All
+                </a>
+            </div>
+        </form>
+    </aside>
+
+    <!-- Main Products Directory -->
+    <section>
+        <!-- Sort and Result Header -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem; background: var(--bg-card); padding: 0.8rem 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div style="font-size: 0.95rem; color:var(--text-muted);">
+                Showing <strong>{{ products | length }}</strong> available items
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <label for="sort-select" style="font-size: 0.85rem; font-weight: 600; color:var(--text-muted);">Sort By:</label>
+                <select id="sort-select" class="form-control" style="width: 150px; padding: 0.4rem; font-size: 0.85rem;" onchange="applySorting(this.value)">
+                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest Arrival</option>
+                    <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Alphabetical: A-Z</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Vegetables Grid -->
+        <div class="veg-grid">
+            {% for product in products %}
+                <div class="veg-card">
+                    <div class="veg-img-container">
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}">
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="veg-img">
+                        </a>
+                        <span class="veg-badge">{{ product.category }}</span>
+                        {% if product.reviews %}
+                            <span class="veg-rating-badge">
+                                <i class="fa-solid fa-star"></i> {{ product.average_rating }}
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div class="veg-info">
+                        <span class="veg-category">{{ product.category }}</span>
+                        <h3 class="veg-name">
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" style="color:var(--primary-dark); hover:color:var(--primary-light);">{{ product.name }}</a>
+                        </h3>
+                        <p class="veg-farmer">Grown by: <span>{{ product.farmer.name }}</span> ({{ product.farmer.region }})</p>
+                        
+                        <div class="veg-price-row">
+                            <div class="veg-price">Rs. {{ product.price }} <span>/ {{ product.unit }}</span></div>
+                            <div style="display: flex; gap: 0.3rem;">
+                                {% if current_role == 'customer' %}
+                                    <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" style="display: inline;">
+                                        <input type="hidden" name="quantity" value="1.0">
+                                        <button type="submit" class="btn btn-primary btn-icon" title="Add to Cart">
+                                            <i class="fa-solid fa-cart-plus"></i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background:var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                    <i class="fa-solid fa-magnifying-glass-minus" style="font-size: 3.5rem; color:var(--primary-light); margin-bottom: 1rem;"></i>
+                    <h3>No Products Found</h3>
+                    <p style="color:var(--text-muted); margin-top: 0.5rem;">We couldn't find any items matching your query or filter configurations.</p>
+                    <a href="{{ url_for('products') }}" class="btn btn-primary btn-sm" style="margin-top: 1.5rem;">Reset All Filters</a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<script>
+    function selectCategory(cat) {
+        document.getElementById('category-hidden').value = cat;
+        document.getElementById('filter-form').submit();
+    }
+    
+    function applySorting(sortVal) {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('sort', sortVal);
+        window.location.search = urlParams.toString();
+    }
+</script>
+{% endblock %}

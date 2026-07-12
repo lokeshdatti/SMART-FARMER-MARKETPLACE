@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up | Smart Farmer Marketplace{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 550px;">
+    <h2 style="text-align: center; margin-bottom: 0.5rem; color: var(--primary-dark);">Join the Marketplace</h2>
+    <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Sign up to buy or sell fresh green vegetables.</p>
+    
+    <!-- Auth Toggle Tabs -->
+    <div class="auth-tabs">
+        <div id="customer-tab" class="auth-tab active" onclick="setRole('customer')">
+            <i class="fa-solid fa-basket-shopping"></i> Customer
+        </div>
+        <div id="farmer-tab" class="auth-tab" onclick="setRole('farmer')">
+            <i class="fa-solid fa-tractor"></i> Farmer
+        </div>
+    </div>
+    
+    <!-- Form -->
+    <form action="{{ url_for('register') }}" method="POST">
+        <!-- Hidden input to submit selected role -->
+        <input type="hidden" name="role" id="role-input" value="customer">
+        
+        <div class="form-group">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" name="name" id="name" class="form-control" placeholder="e.g. Lokesh Kumar" required autocomplete="name">
+        </div>
+        
+        <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="e.g. lokesh@consumer.com" required autocomplete="email">
+        </div>
+        
+        <div class="form-group">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="tel" name="phone" id="phone" class="form-control" placeholder="10-digit number" required autocomplete="tel">
+        </div>
+        
+        <!-- Farmer specific fields -->
+        <div class="form-group" id="farmer-fields" style="display: none;">
+            <label for="region" class="form-label">Agricultural Region</label>
+            <input type="text" name="region" id="region" class="form-control" placeholder="e.g. North India (Punjab)">
+        </div>
+        
+        <div class="form-group">
+            <label for="address" class="form-label">Delivery/Farm Address</label>
+            <textarea name="address" id="address" class="form-control" rows="3" placeholder="enter complete address details" required></textarea>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+        
+        <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">
+            Register as Customer
+        </button>
+    </form>
+    
+    <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+        <span style="color: var(--text-muted);">Already have an account? </span>
+        <a href="{{ url_for('login') }}" style="color: var(--primary-light); font-weight: 700;">Sign in here</a>
+    </div>
+</div>
+
+<script>
+    function setRole(role) {
+        document.getElementById('role-input').value = role;
+        
+        // Toggle tab highlights
+        document.getElementById('customer-tab').classList.toggle('active', role === 'customer');
+        document.getElementById('farmer-tab').classList.toggle('active', role === 'farmer');
+        
+        // Show/hide farmer specific fields
+        const farmerFields = document.getElementById('farmer-fields');
+        const regionInput = document.getElementById('region');
+        
+        if (role === 'farmer') {
+            farmerFields.style.display = 'block';
+            regionInput.required = true;
+        } else {
+            farmerFields.style.display = 'none';
+            regionInput.required = false;
+            regionInput.value = '';
+        }
+        
+        // Update submit button text
+        const btn = document.getElementById('submit-btn');
+        if (role === 'customer') {
+            btn.innerHTML = '<i class="fa-solid fa-basket-shopping"></i> Register as Customer';
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-tractor"></i> Register as Farmer';
+        }
+    }
+    // Set initial text
+    setRole('customer');
+</script>
+{% endblock %}

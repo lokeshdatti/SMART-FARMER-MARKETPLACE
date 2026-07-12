@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} | Smart Farmer Marketplace{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <a href="{{ url_for('products') }}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i> Back to Directory</a>
+</div>
+
+<!-- Product Profile Details -->
+<div class="product-detail-layout">
+    <!-- Left Panel: Image -->
+    <div class="detail-img-container">
+        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="detail-img">
+    </div>
+    
+    <!-- Right Panel: Description and Cart Actions -->
+    <div class="detail-info">
+        <span class="detail-category">{{ product.category }}</span>
+        <h1 class="detail-name">{{ product.name }}</h1>
+        
+        <div class="detail-rating">
+            <div class="stars">
+                {% if product.reviews %}
+                    {% for i in range(1, 6) %}
+                        {% if i <= product.average_rating | int %}
+                            <i class="fa-solid fa-star"></i>
+                        {% elif i - 1 < product.average_rating and product.average_rating < i %}
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                        {% else %}
+                            <i class="fa-regular fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <span style="color:var(--text-muted); font-size:0.9rem; margin-left:0.5rem;">({{ product.average_rating }} / 5 from {{ product.reviews | length }} reviews)</span>
+                {% else %}
+                    <span style="color:var(--text-muted); font-size:0.9rem;">No reviews yet</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="detail-price">
+            Rs. {{ product.price }} <span>/ {{ product.unit }}</span>
+        </div>
+        
+        <p class="detail-description">
+            {{ product.description or 'No description provided for this fresh farm vegetable.' }}
+        </p>
+        
+        <div class="detail-meta">
+            <div class="meta-item"><strong>Category:</strong> {{ product.category }}</div>
+            <div class="meta-item"><strong>Grown by:</strong> {{ product.farmer.name }}</div>
+            <div class="meta-item"><strong>Location:</strong> {{ product.farmer.region }} ({{ product.farmer.address }})</div>
+            <div class="meta-item">
+                <strong>Stock Status:</strong> 
+                {% if product.quantity > 0 %}
+                    <span style="color:var(--primary-light); font-weight:700;">{{ product.quantity }} {{ product.unit }} available</span>
+                {% else %}
+                    <span style="color:#e53e3e; font-weight:700;">Out of Stock</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if current_role == 'customer' %}
+            {% if product.quantity > 0 %}
+                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
+                    <div class="quantity-selector">
+                        <label for="quantity" style="font-weight: 600;">Quantity ({{ product.unit }}):</label>
+                        <input type="number" name="quantity" id="quantity" class="form-control quantity-input" 
+                               value="1.0" min="0.1" max="{{ product.quantity }}" step="0.1" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="padding:0.8rem 2rem;">
+                        <i class="fa-solid fa-cart-plus"></i> Add to Basket
+                    </button>
+                </form>
+            {% else %}
+                <button class="btn btn-secondary" style="padding:0.8rem 2rem; cursor: not-allowed;" disabled>
+                    <i class="fa-solid fa-ban"></i> Temporarily Out of Stock
+                </button>
+            {% endif %}
+        {% elif not current_user %}
+            <div style="background-color: var(--primary-pale); padding: 1rem; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-color);">
+                <p style="font-size:0.9rem; font-weight:600; color:var(--primary-dark);">Please sign in as a customer to purchase vegetables and add to cart.</p>
+                <a href="{{ url_for('login') }}" class="btn btn-primary btn-sm" style="margin-top:0.5rem;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- AI Price Prediction Dashboard Card -->
+<section class="ai-prediction-panel">
+    <div class="ai-header">
+        <span class="ai-icon">🧠</span>
+        <div>
+            <h2 class="ai-title">AI Price Forecast & Seasonality Engine</h2>
+            <p style="font-size: 0.85rem; color:var(--text-muted); margin-top: 0.2rem;">
+                Evaluating crop patterns, seasonal sine fluctuations, and dynamic supply-demand vectors.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Controls to adjust inputs for forecast -->
+    <div class="ai-form-row">
+        <div>
+            <label class="form-label" for="demand-select">Demand Level</label>
+            <select id="demand-select" class="form-control">
+                <option value="Low" {% if selected_demand == 'Low' %}selected{% endif %}>Low (Off-season / Low consumption)</option>
+                <option value="Medium" {% if selected_demand == 'Medium' %}selected{% endif %} selected>Medium (Standard Market Demand)</option>
+                <option value="High" {% if selected_demand == 'High' %}selected{% endif %}>High (Festival Season / High consumption)</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label" for="supply-select">Supply Conditions</label>
+            <select id="supply-select" class="form-control">
+                <option value="Low" {% if selected_supply == 'Low' %}selected{% endif %}>Low (Drought / Crop Loss / High prices)</option>
+                <option value="Medium" {% if selected_supply == 'Medium' %}selected{% endif %} selected>Medium (Standard Harvest Vol)</option>
+                <option value="High" {% if selected_supply == 'High' %}selected{% endif %}>High (Bumper Harvest / Low prices)</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Price statistics calculated by JS -->
+    <div class="ai-result-box">
+        <div class="ai-stat">
+            <span class="ai-stat-label">Predicted retail price (Month {{ current_month }})</span>
+            <div class="ai-stat-value" id="current-predict-price">--</div>
+        </div>
+        <div class="ai-stat">
+            <span class="ai-stat-label">Minimum Projected Price</span>
+            <div class="ai-stat-value down" id="min-predict-price">--</div>
+        </div>
+        <div class="ai-stat">
+            <span class="ai-stat-label">Maximum Projected Price</span>
+            <div class="ai-stat-value up" id="max-predict-price">--</div>
+        </div>
+    </div>
+    
+    <!-- Chart Container -->
+    <div class="chart-container">
+        <canvas id="predictionChart" data-category="{{ product.category }}" data-current-month="{{ current_month }}"></canvas>
+    </div>
+</section>
+
+<!-- Reviews & Ratings Section -->
+<section class="reviews-section">
+    <h2 class="section-title" style="margin-bottom: 2rem;">Customer Reviews & Ratings</h2>
+    
+    <div class="reviews-grid">
+        <!-- Left Column: Aggregate Rating -->
+        <div class="rating-overview">
+            <h3 style="margin-bottom: 1rem; color:var(--primary-dark);">Overall Rating</h3>
+            <div class="rating-big">{{ product.average_rating }}</div>
+            <div class="stars" style="margin: 0.5rem 0;">
+                {% for i in range(1, 6) %}
+                    {% if i <= product.average_rating | int %}
+                        <i class="fa-solid fa-star"></i>
+                    {% else %}
+                        <i class="fa-regular fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Based on {{ product.reviews | length }} ratings</p>
+            
+            {% if current_role == 'customer' %}
+                <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                    <h4 style="margin-bottom: 1rem; color:var(--primary-dark);">Leave Your Feedback</h4>
+                    <form action="{{ url_for('product_detail', product_id=product.id) }}" method="POST">
+                        <div class="form-group" style="text-align: left;">
+                            <label class="form-label" for="rating">Rating Score</label>
+                            <select name="rating" id="rating" class="form-control" required>
+                                <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+                                <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+                                <option value="3">⭐⭐⭐ 3 Stars</option>
+                                <option value="2">⭐⭐ 2 Stars</option>
+                                <option value="1">⭐ 1 Star</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="text-align: left;">
+                            <label class="form-label" for="comment">Your Comment</label>
+                            <textarea name="comment" id="comment" class="form-control" rows="3" placeholder="Tell us about freshness, delivery, quality..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">Submit Review</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Right Column: User Reviews List -->
+        <div class="review-list">
+            {% for review in product.reviews %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <div>
+                            <span class="review-author"><i class="fa-solid fa-circle-user"></i> {{ review.customer.name }}</span>
+                            <div class="stars" style="font-size: 0.8rem; margin-top: 0.2rem;">
+                                {% for i in range(1, 6) %}
+                                    {% if i <= review.rating %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <span class="review-date">{{ review.created_at.strftime('%d %b %Y') }}</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.95rem;">
+                        {{ review.comment or 'No written feedback provided.' }}
+                    </p>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 3rem; background: var(--bg-card); border-radius: var(--radius-md); border:1px solid var(--border-color); color:var(--text-muted);">
+                    <i class="fa-regular fa-comment-dots" style="font-size: 2.5rem; margin-bottom: 1rem; color:var(--primary-light);"></i>
+                    <p>No reviews have been written for this vegetable yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

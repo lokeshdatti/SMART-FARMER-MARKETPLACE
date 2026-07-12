@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | Smart Farmer-to-Consumer Produce Marketplace{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-text">
+        <span class="hero-tagline">100% Direct from Farm</span>
+        <h1 class="hero-title">Fresh Organic <span>Vegetables</span> Delivered to Your Doorstep</h1>
+        <p class="hero-description">
+            Connect directly with local farmers. Get fresh organic vegetables at fair, AI-predicted prices. Zero middlemen. Maximum freshness.
+        </p>
+        <div style="display:flex; gap:1rem;">
+            <a href="{{ url_for('products') }}" class="btn btn-primary"><i class="fa-solid fa-cart-shopping"></i> Shop Produce</a>
+            <a href="{{ url_for('register') }}" class="btn btn-secondary"><i class="fa-solid fa-wheat-awn"></i> Sell as Farmer</a>
+        </div>
+    </div>
+    <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1597362925123-77861d3fbac7?w=600&auto=format&fit=crop&q=80" alt="Fresh Glossy Vegetables">
+    </div>
+</section>
+
+<!-- Featured Produce Section -->
+<section style="margin-bottom: 4rem;">
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">Featured Produce</h2>
+            <p style="color:var(--text-muted); margin-top: 0.5rem;">Freshly harvested organic items available right now.</p>
+        </div>
+        <a href="{{ url_for('products') }}" class="btn btn-secondary btn-sm">View All <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    
+    <div class="veg-grid">
+        {% for product in featured_products %}
+            <div class="veg-card">
+                <div class="veg-img-container">
+                    <a href="{{ url_for('product_detail', product_id=product.id) }}">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="veg-img">
+                    </a>
+                    <span class="veg-badge">{{ product.category }}</span>
+                    {% if product.reviews %}
+                        <span class="veg-rating-badge">
+                            <i class="fa-solid fa-star"></i> {{ product.average_rating }}
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="veg-info">
+                    <span class="veg-category">{{ product.category }}</span>
+                    <h3 class="veg-name">
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}" style="color:var(--primary-dark); hover:color:var(--primary-light);">{{ product.name }}</a>
+                    </h3>
+                    <p class="veg-farmer">Grown by: <span>{{ product.farmer.name }}</span></p>
+                    
+                    <div class="veg-price-row">
+                        <div class="veg-price">Rs. {{ product.price }} <span>/ {{ product.unit }}</span></div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 4.5rem 2rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); z-index: 10;">
+                <div style="font-size: 3.5rem; color: var(--primary-light); margin-bottom: 1rem;"><i class="fa-solid fa-seedling"></i></div>
+                <h3 style="font-size: 1.6rem; color: var(--primary-dark); font-weight: 700;">Marketplace is Ready!</h3>
+                <p style="color: var(--text-muted); max-width: 520px; margin: 0.5rem auto 1.8rem; line-height: 1.6; font-size: 1rem;">
+                    No products are currently listed in the database. Log in as a Farmer to start adding fresh organic vegetables to the catalog!
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i> Login as Farmer</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-secondary"><i class="fa-solid fa-user-plus"></i> Join as Partner</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Platform Key Features -->
+<section style="margin-bottom: 4rem; display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:2rem;">
+    <div class="stat-card" style="padding: 2.5rem 1.5rem;">
+        <div style="font-size: 2.5rem; color: var(--primary-light); margin-bottom: 1rem;"><i class="fa-solid fa-brain"></i></div>
+        <h3>AI Price Prediction</h3>
+        <p style="color:var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">
+            No price manipulations! Our custom AI model evaluates supply, demand, and seasons to recommend fair prices.
+        </p>
+    </div>
+    <div class="stat-card" style="padding: 2.5rem 1.5rem;">
+        <div style="font-size: 2.5rem; color: var(--primary-light); margin-bottom: 1rem;"><i class="fa-solid fa-handshake-slash"></i></div>
+        <h3>Zero Middlemen</h3>
+        <p style="color:var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">
+            Farmers get 100% of the sale value. Consumers get organic vegetables directly from fields at minimum cost.
+        </p>
+    </div>
+    <div class="stat-card" style="padding: 2.5rem 1.5rem;">
+        <div style="font-size: 2.5rem; color: var(--primary-light); margin-bottom: 1rem;"><i class="fa-solid fa-truck-ramp-box"></i></div>
+        <h3>Fresh & Clean</h3>
+        <p style="color:var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">
+            Direct sourcing means faster delivery. Harvested upon order placement and shipped with absolute hygiene.
+        </p>
+    </div>
+</section>
+
+<!-- Farmers Section -->
+<section class="farmers-section">
+    <h2 class="section-title">Our Agricultural Partners</h2>
+    <p style="color:var(--primary-dark); opacity: 0.8; margin-top: 0.5rem;">Empowering local farmers across regions. Meet the hands that grow your food.</p>
+    
+    <div class="farmer-grid">
+        {% for farmer in farmers %}
+            <div class="farmer-card">
+                <div class="farmer-avatar">
+                    {{ farmer.name[0] | upper }}
+                </div>
+                <div class="farmer-card-info">
+                    <h3>{{ farmer.name }}</h3>
+                    <p><i class="fa-solid fa-location-dot"></i> Region: {{ farmer.region }}</p>
+                    <p style="margin-top: 0.3rem;"><i class="fa-solid fa-calendar-days"></i> Partner since: {{ farmer.joined_at.strftime('%b %Y') }}</p>
+                </div>
+            </div>
+        {% else %}
+            <p style="grid-column: 1/-1; text-align: center;">No farmers joined yet.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
