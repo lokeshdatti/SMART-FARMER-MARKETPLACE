@@ -72,43 +72,27 @@ python app.py
 `
 ---
 
-## 🔑 Pre-registered Accounts for Testing
-
-Use these accounts to test the application flows:
-
-### 1. Farmers (Can list products on the Dashboard)
-* **Email**: `ramesh@farmer.com` | **Password**: `password123`
-* **Email**: `suresh@farmer.com` | **Password**: `password123`
-* **Email**: `anil@farmer.com`   | **Password**: `password123`
-
-### 2. Customers (Can purchase vegetables and leave reviews)
-* **Email**: `lokesh@consumer.com` | **Password**: `password123`
-* **Email**: `vamsi@consumer.com`  | **Password**: `password123`
-* **Email**: `priya@consumer.com`  | **Password**: `password123`
-
----
-
 ## 📂 Project Structure
 
 ```
 Lokesh/
 │
-├── app.py                  # Main Flask server and routes controller
-├── models.py               # SQLAlchemy database schemas (Farmer, Customer, Product, Order, etc.)
-├── config.py               # App configuration keys & paths
-├── prediction_engine.py    # AI price prediction algorithms
-├── recommender.py          # Customer purchase recommendation logic
-├── seed.py                 # Database initialization and mock data seeder
-├── test_app.py             # Automated unit tests suite
-├── requirements.txt        # Python dependency manifest
+├── app.py                                               # Main Flask server and routes controller
+├── models.py                                           # SQLAlchemy database schemas (Farmer, Customer, Product, Order, etc.)
+├── config.py                                            # App configuration keys & paths
+├── prediction_engine.py                                 # AI price prediction algorithms
+├── recommender.py                                  # Customer purchase recommendation logic
+├── seed.py                                          # Database initialization and mock data seeder
+├── test_app.py                                       # Automated unit tests suite
+├── requirements.txt                                    # Python dependency manifest
 │
 ├── static/
-│   ├── css/style.css       # Core styles, glassmorphic themes, and animations
-│   └── js/main.js          # Theme toggle handler and search queries
+│   ├── css/style.css                                       # Core styles, glassmorphic themes, and animations
+│   └── js/main.js                                           # Theme toggle handler and search queries
 │
-└── templates/              # HTML layout templates (base, index, products, dashboard, etc.)
+└── templates/                                               # HTML layout templates (base, index, products, dashboard, etc.)
 ```
 ## 🚀 Live Demo
-
 https://smart-farmer-nwfy.onrender.com
+
 
