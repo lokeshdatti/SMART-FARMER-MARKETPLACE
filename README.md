@@ -113,3 +113,6 @@ Lokesh/
 │
 └── templates/              # HTML layout templates (base, index, products, dashboard, etc.)
 ```
+## live demo
+https://smart-farmer-nwfy.onrender.com
+
