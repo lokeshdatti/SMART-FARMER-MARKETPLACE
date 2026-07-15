@@ -69,12 +69,7 @@ python seed.py
 Start the local development server:
 ```bash
 python app.py
-```
-
-### 5. Access the Web App
-Open your web browser and navigate to:
-👉 **[http://127.0.0.1:5000](http://127.0.0.1:5000)**
-
+`
 ---
 
 ## 🔑 Pre-registered Accounts for Testing
