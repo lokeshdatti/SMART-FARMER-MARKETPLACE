@@ -69,7 +69,7 @@ python seed.py
 Start the local development server:
 ```bash
 python app.py
-`
+```
 ---
 
 ## 📂 Project Structure
@@ -92,6 +92,7 @@ Lokesh/
 │
 └── templates/                                               # HTML layout templates (base, index, products, dashboard, etc.)
 ```
+
 ## 🚀 Live Demo
 https://smart-farmer-nwfy.onrender.com
 
