@@ -95,5 +95,7 @@ Lokesh/
 
 ## 🚀 Live Demo
 https://smart-farmer-nwfy.onrender.com
+```
+home-page.png
 
 
