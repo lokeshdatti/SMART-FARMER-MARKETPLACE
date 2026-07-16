@@ -100,6 +100,6 @@ https://smart-farmer-nwfy.onrender.com
 
 ### 🏠 Home Page
 
-![Home Page](images/home-page.png)
+![Home Page](home-page.png)
 
 
